@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -42,6 +43,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
 
     def paging_version = "3.1.1"
 
@@ -50,17 +52,22 @@ dependencies {
     // alternatively - without Android dependencies for tests
     testImplementation "androidx.paging:paging-common:$paging_version"
 
-    // ksp
-    implementation 'com.google.devtools.ksp:symbol-processing-api:1.6.10-1.0.2'
+
+
+
+    implementation "io.insert-koin:koin-android:3.2.0"
+
 
     def room_version = "2.4.2"
-
     implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
-    // optional - Paging 3 Integration
-    implementation "androidx.room:room-paging:2.5.0-alpha02"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-paging:$room_version"
 
-    implementation "io.insert-koin:koin-android:3.1.2"
+
+    implementation("io.coil-kt:coil:2.1.0")
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

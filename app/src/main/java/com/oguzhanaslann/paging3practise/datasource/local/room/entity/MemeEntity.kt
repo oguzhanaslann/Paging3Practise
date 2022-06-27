@@ -4,10 +4,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "meme")
 data class MemeEntity(
     @PrimaryKey
     @ColumnInfo(name = "id") // to prevent İ-I confusion
     val id: String,
+
     val url: String
 )

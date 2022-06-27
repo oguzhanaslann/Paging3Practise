@@ -5,15 +5,19 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.oguzhanaslann.paging3practise.datasource.local.room.dao.MemeDao
+import com.oguzhanaslann.paging3practise.datasource.local.room.dao.RemoteKeysDao
 import com.oguzhanaslann.paging3practise.datasource.local.room.entity.MemeEntity
+import com.oguzhanaslann.paging3practise.datasource.local.room.entity.RemoteKeys
 
 @Database(
-    entities = [MemeEntity::class],
-    version = MemeDB.LATEST_VERSION
+    entities = [MemeEntity::class,RemoteKeys::class],
+    version = 1,
+    exportSchema = false
 )
 abstract class MemeDB : RoomDatabase() {
 
     abstract fun memeDao(): MemeDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
 
     companion object {
         const val LATEST_VERSION = 1
