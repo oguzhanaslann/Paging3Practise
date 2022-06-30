@@ -12,7 +12,7 @@ import com.oguzhanaslann.paging3practise.datasource.network.MemeNetworkSource
 import com.oguzhanaslann.paging3practise.domain.Meme
 
 const val INIT_PAGE = 0
-const val PAGE_SIZE = 5
+const val PAGE_SIZE = 3
 
 @OptIn(ExperimentalPagingApi::class)
 class MemeRemoteMediator(
@@ -53,14 +53,19 @@ class MemeRemoteMediator(
                 nextKey
             }
         }
+        Log.e("TAG", "load: page $page")
 
         try {
             val memesResult: Result<List<Meme>> =
                 memeNetworkSource.getMemes(page, state.config.pageSize)
+            Log.e("TAG", "load: ${memesResult}")
             val memes = memesResult.getOrDefault(emptyList())
+            Log.e("TAG", "load:memes  ${memes}")
             val endOfPaginationReached = memes.isEmpty()
             if (loadType == LoadType.REFRESH) {
+                Log.e("TAG", "load: REFRESH")
                 memeLocalSource.runInTransaction {
+                    Log.e("TAG", "load: runInTransaction")
                     memeLocalSource.remoteKeysDao().clearRemoteKeys()
                     memeLocalSource.memeDao().clear()
                 }
@@ -71,12 +76,21 @@ class MemeRemoteMediator(
                 RemoteKeys(memeId = it.id, prevKey = prevKey, nextKey = nextKey)
             }
             memeLocalSource.remoteKeysDao().insertAll(keys)
-            val memeEntities: List<MemeEntity> = emptyList()
+            val memeEntities: List<MemeEntity> = memes.map {
+                MemeEntity(
+                    id = it.id,
+                    url = it.url,
+                )
+            }
             memeLocalSource.memeDao().insert(memeEntities)
 //            }
-            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached).also {
+                Log.e("TAG", "load: success $it")
+            }
         } catch (exception: Exception) {
-            return MediatorResult.Error(exception)
+            return MediatorResult.Error(exception).also {
+                Log.e("TAG", "load: error $it. exception: ${exception.message}")
+            }
         }
     }
 

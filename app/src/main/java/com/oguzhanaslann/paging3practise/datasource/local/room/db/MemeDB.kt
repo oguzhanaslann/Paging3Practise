@@ -10,7 +10,7 @@ import com.oguzhanaslann.paging3practise.datasource.local.room.entity.MemeEntity
 import com.oguzhanaslann.paging3practise.datasource.local.room.entity.RemoteKeys
 
 @Database(
-    entities = [MemeEntity::class,RemoteKeys::class],
+    entities = [MemeEntity::class, RemoteKeys::class],
     version = 1,
     exportSchema = false
 )
@@ -34,7 +34,9 @@ abstract class MemeDB : RoomDatabase() {
                     context.applicationContext,
                     MemeDB::class.java,
                     DATABASE_NAME
-                ).build()
+                )
+                    .allowMainThreadQueries()
+                    .build()
                 INSTANCE = instance
                 // return instance
                 instance
