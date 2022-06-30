@@ -11,7 +11,7 @@ class MemeNetworkDataProvider : MemeNetworkSource {
             repeat(pageSize) {
                 Meme(
                     id = UUID.randomUUID().toString(),
-                    url = "https://picsum.photos/id/1/200/200"
+                    url = "https://picsum.photos/id/1/400/4000"
                 ).also {
                     list.add(it)
                 }

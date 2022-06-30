@@ -31,7 +31,7 @@ class MemeAdapter : PagingDataAdapter<Meme, MemeAdapter.Holder>(DiffCallBack()) 
 
     inner class Holder(val binding: ItemMemeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(currentItem: Meme) = binding.run {
-            memeImage.load(currentItem)
+            memeImage.load(currentItem.url)
             memeText.text = currentItem.id
         }
 
