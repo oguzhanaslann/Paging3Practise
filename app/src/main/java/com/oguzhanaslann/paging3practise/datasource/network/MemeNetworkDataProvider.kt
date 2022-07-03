@@ -10,8 +10,8 @@ class MemeNetworkDataProvider : MemeNetworkSource {
         if (page <= 20) {
             repeat(pageSize) {
                 Meme(
-                    id = UUID.randomUUID().toString(),
-                    url = "https://picsum.photos/id/1/400/4000"
+                    id = "${page}-${it}",
+                    url = "https://picsum.photos/id/1/400/400"
                 ).also {
                     list.add(it)
                 }

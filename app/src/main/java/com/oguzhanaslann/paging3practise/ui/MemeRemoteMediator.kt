@@ -12,44 +12,35 @@ import com.oguzhanaslann.paging3practise.datasource.network.MemeNetworkSource
 import com.oguzhanaslann.paging3practise.domain.Meme
 
 const val INIT_PAGE = 0
-const val PAGE_SIZE = 3
+const val PAGE_SIZE = 1
 
 @OptIn(ExperimentalPagingApi::class)
 class MemeRemoteMediator(
     val memeNetworkSource: MemeNetworkSource,
     val memeLocalSource: MemeDB
 ) : RemoteMediator<Int, Meme>() {
+
+    override suspend fun initialize(): InitializeAction {
+        return InitializeAction.LAUNCH_INITIAL_REFRESH
+    }
+
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Meme>): MediatorResult {
-        Log.e("TAG", "load: ", )
         val page = when (loadType) {
             LoadType.REFRESH -> {
+                Log.e("TAG", "load: LoadType.REFRESH")
                 val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
                 remoteKeys?.nextKey?.minus(1) ?: INIT_PAGE
             }
             LoadType.PREPEND -> {
                 val remoteKeys = getRemoteKeyForFirstItem(state)
-                // If remoteKeys is null, that means the refresh result is not in the database yet.
-                // We can return Success with `endOfPaginationReached = false` because Paging
-                // will call this method again if RemoteKeys becomes non-null.
-                // If remoteKeys is NOT NULL but its prevKey is null, that means we've reached
-                // the end of pagination for prepend.
                 val prevKey = remoteKeys?.prevKey
-                if (prevKey == null) {
-                    return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                }
+                    ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 prevKey
             }
             LoadType.APPEND -> {
                 val remoteKeys = getRemoteKeyForLastItem(state)
-                // If remoteKeys is null, that means the refresh result is not in the database yet.
-                // We can return Success with `endOfPaginationReached = false` because Paging
-                // will call this method again if RemoteKeys becomes non-null.
-                // If remoteKeys is NOT NULL but its prevKey is null, that means we've reached
-                // the end of pagination for append.
                 val nextKey = remoteKeys?.nextKey
-                if (nextKey == null) {
-                    return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                }
+                    ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 nextKey
             }
         }
@@ -58,14 +49,10 @@ class MemeRemoteMediator(
         try {
             val memesResult: Result<List<Meme>> =
                 memeNetworkSource.getMemes(page, state.config.pageSize)
-            Log.e("TAG", "load: ${memesResult}")
             val memes = memesResult.getOrDefault(emptyList())
-            Log.e("TAG", "load:memes  ${memes}")
             val endOfPaginationReached = memes.isEmpty()
             if (loadType == LoadType.REFRESH) {
-                Log.e("TAG", "load: REFRESH")
                 memeLocalSource.runInTransaction {
-                    Log.e("TAG", "load: runInTransaction")
                     memeLocalSource.remoteKeysDao().clearRemoteKeys()
                     memeLocalSource.memeDao().clear()
                 }
@@ -84,13 +71,9 @@ class MemeRemoteMediator(
             }
             memeLocalSource.memeDao().insert(memeEntities)
 //            }
-            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached).also {
-                Log.e("TAG", "load: success $it")
-            }
+            return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (exception: Exception) {
-            return MediatorResult.Error(exception).also {
-                Log.e("TAG", "load: error $it. exception: ${exception.message}")
-            }
+            return MediatorResult.Error(exception)
         }
     }
 

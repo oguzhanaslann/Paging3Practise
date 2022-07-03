@@ -5,9 +5,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.oguzhanaslann.paging3practise.databinding.ActivityMainBinding
-import com.oguzhanaslann.paging3practise.datasource.local.room.db.MemeDB
-import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -31,18 +30,24 @@ class MainActivity : AppCompatActivity() {
             rvMemes.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = memeAdapter
+                LinearSnapHelper().attachToRecyclerView(this)
             }
         }
-
-//        val appDatabase: MemeDB = get()
 
         lifecycleScope.launchWhenStarted {
             memeViewModel.getMemes()
                 .collect {
-                    Log.e("TAG", "onCreate: it $it" )
                     memeAdapter.submitData(it)
                 }
 
+        }
+
+        lifecycleScope.launchWhenStarted {
+            memeAdapter.loadStateFlow.collect {
+//                Log.e("TAG", "onCreate: it.source ${it.source}" )
+//                Log.e("TAG", "onCreate: ")
+//                Log.e("TAG", "onCreate: it.mediator ${it.mediator}" )
+            }
         }
     }
 }

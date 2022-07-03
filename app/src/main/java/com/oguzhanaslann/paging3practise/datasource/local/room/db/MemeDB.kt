@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.oguzhanaslann.paging3practise.datasource.local.room.dao.MemeDao
 import com.oguzhanaslann.paging3practise.datasource.local.room.dao.RemoteKeysDao
+import com.oguzhanaslann.paging3practise.datasource.local.room.db.MemeDB.Companion.LATEST_VERSION
 import com.oguzhanaslann.paging3practise.datasource.local.room.entity.MemeEntity
 import com.oguzhanaslann.paging3practise.datasource.local.room.entity.RemoteKeys
 
 @Database(
     entities = [MemeEntity::class, RemoteKeys::class],
-    version = 1,
+    version = LATEST_VERSION,
     exportSchema = false
 )
 abstract class MemeDB : RoomDatabase() {
